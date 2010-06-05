@@ -131,6 +131,36 @@ body {
   color: black;
 }
 
+.resultMessage > table {
+  width: 100%;
+  font-size: .8em;
+  padding: 0;
+  margin: 0;
+}
+
+.resultMessage > table > tr > th, .resultMessage > table > tr > td {
+  text-align: left;
+  width: 50%;
+  padding: 0;
+  margin: 0;
+}
+
+.resultMessage td {
+  vertical-align: top;
+  border: 1px inset;
+}
+
+.resultMessage pre {
+  margin: 0;
+}
+
+.resultMessage .object, .resultMessage .array {
+}
+
+.resultMessage .string {
+  font-style: italic;
+}
+
 .stackTrace {
   white-space: pre;
   font-size: .8em;

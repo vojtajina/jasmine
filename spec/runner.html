@@ -29,6 +29,7 @@
   <script type="text/javascript" src="../src/WaitsForBlock.js"></script>
 
   <script type="text/javascript" src="../lib/TrivialReporter.js"></script>
+  <script type="text/javascript" src="../src/FancyHtmlReporter.js"></script>
   <script type="text/javascript" src="../lib/consolex.js"></script>
 
 
@@ -59,12 +60,12 @@
       var jasmineEnv = jasmine.getEnv();
       jasmineEnv.updateInterval = 1000;
 
-      var trivialReporter = new jasmine.TrivialReporter();
+      var reporter = new jasmine.FancyHtmlReporter();
 
-      jasmineEnv.addReporter(trivialReporter);
+      jasmineEnv.addReporter(reporter);
 
       jasmineEnv.specFilter = function(spec) {
-        return trivialReporter.specFilter(spec);
+        return reporter.specFilter(spec);
       };
 
       window.onload = function() {
