@@ -17,7 +17,11 @@ jasmine.FancyHtmlReporter.prototype.createDom = function(type, attrs, childrenVa
   }
 
   for (var attr in attrs) {
+    if (attr == "className") {
       el[attr] = attrs[attr];
+    } else {
+      el.setAttribute(attr, attrs[attr]);
+    }
   }
 
   return el;
@@ -26,10 +30,29 @@ jasmine.FancyHtmlReporter.prototype.createDom = function(type, attrs, childrenVa
 jasmine.FancyHtmlReporter.prototype.reportRunnerStarting = function(runner) {
   var suites = runner.suites();
 
-  this.runnerDiv = this.createDom('div', { className: 'runner running' },
-      this.createDom('a', { className: 'run_spec', href: '?' }, "run all"),
-      this.runnerMessageSpan = this.createDom('span', {}, "Running..."));
-  this.document.body.appendChild(this.runnerDiv);
+  var showPassed, showSkipped;
+
+  this.outerDiv = this.createDom('div', { className: 'jasmine_reporter' },
+      this.createDom('div', { className: 'banner' },
+        this.createDom('div', { className: 'logo' },
+            "Jasmine",
+            this.createDom('span', { className: 'version' }, runner.env.versionString())),
+        this.createDom('div', { className: 'options' },
+            "Show ",
+            showPassed = this.createDom('input', { id: "__jasmine_TrivialReporter_showPassed__", type: 'checkbox' }),
+            this.createDom('label', { "for": "__jasmine_TrivialReporter_showPassed__" }, " passed "),
+            showSkipped = this.createDom('input', { id: "__jasmine_TrivialReporter_showSkipped__", type: 'checkbox' }),
+            this.createDom('label', { "for": "__jasmine_TrivialReporter_showSkipped__" }, " skipped")
+            )
+          ),
+
+      this.runnerDiv = this.createDom('div', { className: 'runner running' },
+          this.createDom('a', { className: 'run_spec', href: '?' }, "run all"),
+          this.runnerMessageSpan = this.createDom('span', {}, "Running..."),
+          this.finishedAtSpan = this.createDom('span', { className: 'finished-at' }, ""))
+      );
+
+  this.document.body.appendChild(this.outerDiv);
 
   for (var i = 0; i < suites.length; i++) {
     var suite = suites[i];
@@ -37,7 +60,7 @@ jasmine.FancyHtmlReporter.prototype.reportRunnerStarting = function(runner) {
         this.createDom('a', { className: 'run_spec', href: '?spec=' + encodeURIComponent(suite.getFullName()) }, "run"),
         this.createDom('a', { className: 'description', href: '?spec=' + encodeURIComponent(suite.getFullName()) }, suite.description));
     this.suiteDivs[suite.getFullName()] = suiteDiv;
-    var parentDiv = this.document.body;
+    var parentDiv = this.outerDiv;
     if (suite.parentSuite) {
       parentDiv = this.suiteDivs[suite.parentSuite.getFullName()];
     }
@@ -45,6 +68,23 @@ jasmine.FancyHtmlReporter.prototype.reportRunnerStarting = function(runner) {
   }
 
   this.startedAt = new Date();
+
+  var self = this;
+  showPassed.onchange = function(evt) {
+    if (evt.target.checked) {
+      self.outerDiv.className += ' show-passed';
+    } else {
+      self.outerDiv.className = self.outerDiv.className.replace(/ show-passed/, '');
+    }
+  };
+
+  showSkipped.onchange = function(evt) {
+    if (evt.target.checked) {
+      self.outerDiv.className += ' show-skipped';
+    } else {
+      self.outerDiv.className = self.outerDiv.className.replace(/ show-skipped/, '');
+    }
+  };
 };
 
 jasmine.FancyHtmlReporter.prototype.reportRunnerResults = function(runner) {
@@ -63,6 +103,8 @@ jasmine.FancyHtmlReporter.prototype.reportRunnerResults = function(runner) {
   var message = "" + specCount + " spec" + (specCount == 1 ? "" : "s" ) + ", " + results.failedCount + " failure" + ((results.failedCount == 1) ? "" : "s");
   message += " in " + ((new Date().getTime() - this.startedAt.getTime()) / 1000) + "s";
   this.runnerMessageSpan.replaceChild(this.createDom('a', { className: 'description', href: '?'}, message), this.runnerMessageSpan.firstChild);
+
+  this.finishedAtSpan.appendChild(document.createTextNode("Finished at " + new Date().toString()));
 };
 
 jasmine.FancyHtmlReporter.prototype.reportSuiteResults = function(suite) {
@@ -82,7 +124,11 @@ jasmine.FancyHtmlReporter.prototype.reportSpecResults = function(spec) {
   }
   var specDiv = this.createDom('div', { className: 'spec '  + status },
       this.createDom('a', { className: 'run_spec', href: '?spec=' + encodeURIComponent(spec.getFullName()) }, "run"),
-      this.createDom('a', { className: 'description', href: '?spec=' + encodeURIComponent(spec.getFullName()) }, spec.getFullName()));
+      this.createDom('a', {
+        className: 'description',
+        href: '?spec=' + encodeURIComponent(spec.getFullName()),
+        title: spec.getFullName()
+      }, spec.description));
 
 
   var resultItems = results.getItems();
