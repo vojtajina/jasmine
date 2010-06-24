@@ -12,7 +12,7 @@
 <body>
 <script type="text/javascript">
   var jasmineEnv = jasmine.getEnv();
-  jasmineEnv.reporter = new jasmine.TrivialReporter();
+  jasmineEnv.addReporter(jasmine.TrivialReporter());
   jasmineEnv.execute();
 </script>
 
