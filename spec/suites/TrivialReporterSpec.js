@@ -155,6 +155,15 @@ describe("TrivialReporter", function() {
       var errorDiv = findElement(divs, 'resultMessage fail');
       expect(errorDiv.innerHTML).toEqual("Expected '1 &lt; 2' to &lt;b&gt;e null, &amp; it was not");
     });
+
+    xit("should not look weird", function() {
+      expect(123).toBeLessThan(121);
+      expect(jasmine.createSpy("uncalled spy")).toHaveBeenCalled();
+      expect(jasmine.createSpy("uncalled spy")).toHaveBeenCalledWith(123, 456);
+
+      expect(true).not.toEqual(true);
+    });
+
   });
 
   describe("log messages", function() {
